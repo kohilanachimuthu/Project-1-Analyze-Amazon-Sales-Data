@@ -1,0 +1,87 @@
+Project : Analyze Amazon Sales Data:
+
+1.How many total rows (sales records) are in the dataset?
+SELECT count(*) As total_rows
+from AmazonSaleReport 
+
+2.What is the total revenue generated across all sales?
+SELECT sum(amount) As total_revenue
+from AmazonSaleReport 
+
+
+3.Which product category had the highest total quantity sold?
+SELECT category,sum(amount) As totalamount
+from AmazonSaleReport  
+GROUP By category
+ORDER By totalamount desc limit 1
+
+
+4.What is the average sales amount per transaction?
+SELECT avg(amount) from AmazonSaleReport 
+SELECT avg(amount) from AmazonSaleReport 
+Where Status NOT LIKE '%Cancelled%';
+--where lower(trim(Status))!=lower('Cancelled')
+
+
+5.How many unique SKUs were sold?
+SELECT count(distinct(asr.SKU )) from AmazonSaleReport asr
+where Status NOT LIKE '%Cancelled%';
+
+6.What are the top 5 most sold SKUs based on quantity?
+SELECT SKU,sum(Qty) as totalqty
+from AmazonSaleReport 
+where Status NOT LIKE '%Cancelled%'
+GROUP BY sku
+order by totalqty desc  
+limit 5;
+
+7.Which month had the highest total sales revenue?
+SELECT distinct
+     strftime('%Y-%m', 
+        DATE(
+            '20' || substr(date, 7, 2) || '-' ||  -- Year: '20' + YY
+            substr(date, 1, 2) || '-' ||         -- Month: MM
+            substr(date, 4, 2)                   -- Day: DD
+        )
+    ) AS month, 
+    SUM(amount) AS total_sales
+FROM 
+    AmazonSaleReport
+GROUP BY 
+    month
+ORDER BY 
+    total_sales DESC
+LIMIT 1;
+
+
+2022-04	28838708.32
+
+8.How many sales were B2B transactions vs non-B2B?
+select 
+count(case when lower(b2b)= 'true' then 1 end) as 'With B2B',
+count(case when lower(b2b)= 'false' then 1 end) as 'Without B2B'
+FROM AmazonSaleReport; 		
+		
+SELECT b2b, COUNT(*) 
+FROM AmazonSaleReport 
+GROUP BY b2b;
+
+False	128104
+True	871
+
+
+9.Which fulfilment method was used most frequently?
+SELECT Fulfilment,count(*) as count_cal
+FROM AmazonSaleReport 
+Group by Fulfilment
+order by count_cal desc
+limit 1
+
+10.How many sales were made for each product size?
+SELECT size,count(*) as salescount
+FROM AmazonSaleReport 
+where Status not like '%Cancelled%'
+Group by size
+order by salescount desc
+
+-----------------------------------------------------------
